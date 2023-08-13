@@ -21,7 +21,7 @@ import java.util.Date;
 
 @Component
 @RequiredArgsConstructor
-public class UserAuthProvider {
+public class AuthProvider {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
@@ -33,26 +33,26 @@ public class UserAuthProvider {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 
-    public String createToken(UserDto userDto) {
+    public String createToken(UserDto dto) {
         var now = new Date();
         var valid = new Date(now.getTime() + 3_600_000);
         return JWT.create()
-                .withIssuer(userDto.getLogin())
+                .withIssuer(dto.getUsername())
                 .withIssuedAt(now)
                 .withExpiresAt(valid)
-                .withClaim("firstName", userDto.getFirstName())
-                .withClaim("lastName", userDto.getLastName())
+                .withClaim("firstName", dto.getFirstName())
+                .withClaim("lastName", dto.getLastName())
                 .sign(Algorithm.HMAC256(secretKey));
     }
 
     public Authentication validateToken(String token) {
         var algorithm = Algorithm.HMAC256(secretKey);
         var verifier = JWT.require(algorithm).build();
-        var decoded = verifier.verify(token);
+        var decoder = verifier.verify(token);
         var user = UserDto.builder()
-                .login(decoded.getIssuer())
-                .firstName(decoded.getClaim("firstName").asString())
-                .lastName(decoded.getClaim("lastName").asString())
+                .username(decoder.getIssuer())
+                .firstName(decoder.getClaim("firstName").asString())
+                .lastName(decoder.getClaim("lastName").asString())
                 .build();
         return new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
     }
@@ -60,8 +60,8 @@ public class UserAuthProvider {
     public Authentication validateTokenStrong(String token) {
         var algorithm = Algorithm.HMAC256(secretKey);
         var verifier = JWT.require(algorithm).build();
-        var decoded = verifier.verify(token);
-        User user = userRepository.findByLogin(decoded.getIssuer())
+        var decoder = verifier.verify(token);
+        User user = userRepository.findByUsername(decoder.getIssuer())
                 .orElseThrow(() -> new AppException("unknown user", HttpStatus.NOT_FOUND));
         return new UsernamePasswordAuthenticationToken(userMapper.toUserDto(user),
                 null, Collections.emptyList());

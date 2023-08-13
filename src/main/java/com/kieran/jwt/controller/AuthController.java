@@ -1,7 +1,7 @@
 package com.kieran.jwt.controller;
 
 import com.kieran.jwt.dto.CredentialsDto;
-import com.kieran.jwt.dto.SignUpDto;
+import com.kieran.jwt.dto.RegisterDto;
 import com.kieran.jwt.dto.UserDto;
 import com.kieran.jwt.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public UserDto register(@RequestBody SignUpDto signUpDto) {
-        return userService.register(signUpDto);
+    public UserDto register(@RequestBody RegisterDto registerDto) {
+        return userService.register(registerDto);
     }
 }

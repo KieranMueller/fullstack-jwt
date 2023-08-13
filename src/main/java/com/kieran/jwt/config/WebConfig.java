@@ -16,11 +16,9 @@ import java.util.Arrays;
 @EnableWebMvc
 public class WebConfig {
 
-    // Can just annotate controller with @CrossOrigin to allow all as well
-
     @Bean
     public FilterRegistrationBean corsFilter() {
-        var source = new UrlBasedCorsConfigurationSource();
+        var src = new UrlBasedCorsConfigurationSource();
         var config = new CorsConfiguration();
         config.setAllowCredentials(true);
         config.addAllowedOrigin("http://localhost:4200");
@@ -36,8 +34,8 @@ public class WebConfig {
                 HttpMethod.DELETE.name()
         ));
         config.setMaxAge(3600L);
-        source.registerCorsConfiguration("/**", config);
-        var bean = new FilterRegistrationBean<>(new CorsFilter(source));
+        src.registerCorsConfiguration("/**", config);
+        var bean = new FilterRegistrationBean<>(new CorsFilter(src));
         bean.setOrder(-102);
         return bean;
     }

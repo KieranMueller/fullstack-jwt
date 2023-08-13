@@ -15,4 +15,5 @@ public class RestControllerAdvice {
     public ResponseEntity<ErrorDto> handleException(AppException e) {
         return ResponseEntity.status(e.getHttpStatus()).body(new ErrorDto(e.getMessage()));
     }
+
 }

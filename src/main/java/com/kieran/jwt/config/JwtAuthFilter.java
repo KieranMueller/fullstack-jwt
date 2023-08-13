@@ -14,28 +14,32 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-    private final UserAuthProvider authProvider;
+    private final AuthProvider authProvider;
 
     @Override
     protected void doFilterInternal(
-            HttpServletRequest request,
-            HttpServletResponse response,
+            HttpServletRequest req,
+            HttpServletResponse resp,
             FilterChain filterChain) throws ServletException, IOException {
-        String header = request.getHeader(HttpHeaders.AUTHORIZATION);
+        String header = req.getHeader(HttpHeaders.AUTHORIZATION);
         if (header != null) {
             String[] authElements = header.split(" ");
             if (authElements.length == 2 && authElements[0].equals("Bearer")) {
                 try {
-                    if (request.getMethod().equals("GET")) {
-                    } else {
-                        SecurityContextHolder.getContext().setAuthentication(authProvider.validateTokenStrong(authElements[1]));
-                    }
+                    if (req.getMethod().equals("GET"))
+                        SecurityContextHolder
+                                .getContext()
+                                .setAuthentication(authProvider.validateToken(authElements[1]));
+                    else
+                        SecurityContextHolder
+                                .getContext()
+                                .setAuthentication(authProvider.validateTokenStrong(authElements[1]));
                 } catch (RuntimeException e) {
                     SecurityContextHolder.clearContext();
                     throw e;
                 }
             }
         }
-        filterChain.doFilter(request, response);
+        filterChain.doFilter(req, resp);
     }
 }
