@@ -10,7 +10,7 @@ import java.util.List;
 public class MessageController {
 
     @GetMapping("/messages")
-    public ResponseEntity<List<String>> messages() {
-        return ResponseEntity.ok(Arrays.asList("first", "second"));
+    public List<String> messages() {
+        return Arrays.asList("top secret message #1", "top secret message #2");
     }
 }
